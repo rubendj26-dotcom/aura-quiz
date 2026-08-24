@@ -1,0 +1,902 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>AURA | Quiz de Salud Sexual</title>
+
+<style>
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: Arial, Helvetica, sans-serif;
+    background: linear-gradient(135deg, #f4f7ff, #eefaf7);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #243047;
+}
+
+.container {
+    width: 100%;
+    max-width: 850px;
+    padding: 25px;
+}
+
+.quiz-card {
+    background: white;
+    border-radius: 28px;
+    padding: 40px;
+    box-shadow: 0 15px 45px rgba(0,0,0,0.10);
+}
+
+/* LOGO */
+
+.logo {
+    text-align: center;
+    font-size: 38px;
+    font-weight: 800;
+    letter-spacing: 3px;
+    margin-bottom: 10px;
+    color: #5b5fe8;
+}
+
+.logo span {
+    color: #28b99a;
+}
+
+/* INICIO */
+
+.start-screen {
+    text-align: center;
+}
+
+.start-screen h1 {
+    font-size: 32px;
+    margin: 15px 0;
+}
+
+.start-screen p {
+    color: #667085;
+    font-size: 17px;
+    line-height: 1.6;
+    margin-bottom: 30px;
+}
+
+.start-button,
+.next-button,
+.restart-button {
+    border: none;
+    padding: 15px 32px;
+    border-radius: 14px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: .2s;
+}
+
+.start-button {
+    background: #5b5fe8;
+    color: white;
+}
+
+.start-button:hover,
+.next-button:hover,
+.restart-button:hover {
+    transform: translateY(-2px);
+    opacity: .9;
+}
+
+/* QUIZ */
+
+.quiz-screen {
+    display: none;
+}
+
+.top-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+    color: #667085;
+    font-size: 14px;
+    font-weight: bold;
+}
+
+.progress-container {
+    width: 100%;
+    height: 10px;
+    background: #e8ebf3;
+    border-radius: 10px;
+    overflow: hidden;
+    margin-bottom: 30px;
+}
+
+.progress-bar {
+    height: 100%;
+    width: 0%;
+    background: #5b5fe8;
+    transition: width .3s ease;
+}
+
+.category {
+    display: inline-block;
+    background: #eef0ff;
+    color: #5b5fe8;
+    padding: 7px 12px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: bold;
+    margin-bottom: 15px;
+}
+
+.question {
+    font-size: 25px;
+    line-height: 1.4;
+    margin-bottom: 25px;
+}
+
+.answers {
+    display: grid;
+    gap: 12px;
+}
+
+.answer {
+    width: 100%;
+    text-align: left;
+    padding: 17px;
+    border: 2px solid #e5e7eb;
+    border-radius: 15px;
+    background: white;
+    cursor: pointer;
+    font-size: 16px;
+    transition: .2s;
+}
+
+.answer:hover {
+    border-color: #5b5fe8;
+    background: #f8f8ff;
+}
+
+.answer.correct {
+    border-color: #27ae83;
+    background: #eafaf4;
+}
+
+.answer.incorrect {
+    border-color: #e45757;
+    background: #fff0f0;
+}
+
+.answer:disabled {
+    cursor: default;
+}
+
+/* FEEDBACK */
+
+.feedback {
+    display: none;
+    margin-top: 20px;
+    padding: 18px;
+    border-radius: 15px;
+    line-height: 1.5;
+}
+
+.feedback.correct-feedback {
+    background: #eafaf4;
+    color: #167053;
+}
+
+.feedback.incorrect-feedback {
+    background: #fff0f0;
+    color: #a83232;
+}
+
+.next-container {
+    display: none;
+    margin-top: 20px;
+    text-align: right;
+}
+
+.next-button {
+    background: #28b99a;
+    color: white;
+}
+
+/* RESULTADO */
+
+.result-screen {
+    display: none;
+    text-align: center;
+}
+
+.result-icon {
+    font-size: 65px;
+    margin-bottom: 10px;
+}
+
+.result-screen h1 {
+    font-size: 32px;
+    margin-bottom: 12px;
+}
+
+.score {
+    font-size: 55px;
+    font-weight: 800;
+    color: #5b5fe8;
+    margin: 20px 0;
+}
+
+.result-message {
+    font-size: 18px;
+    line-height: 1.6;
+    color: #667085;
+    margin-bottom: 25px;
+}
+
+.restart-button {
+    background: #5b5fe8;
+    color: white;
+}
+
+/* RESPONSIVE */
+
+@media(max-width: 600px) {
+
+    .container {
+        padding: 12px;
+    }
+
+    .quiz-card {
+        padding: 25px 20px;
+        border-radius: 20px;
+    }
+
+    .logo {
+        font-size: 32px;
+    }
+
+    .start-screen h1 {
+        font-size: 26px;
+    }
+
+    .question {
+        font-size: 21px;
+    }
+
+    .answer {
+        font-size: 15px;
+        padding: 15px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<div class="quiz-card">
+
+    <!-- INICIO -->
+
+    <div class="start-screen" id="startScreen">
+
+        <div class="logo">
+            AU<span>R</span>A
+        </div>
+
+        <h1>¿Cuánto sabes sobre salud sexual?</h1>
+
+        <p>
+            Pon a prueba tus conocimientos sobre anatomía,
+            pubertad, métodos anticonceptivos, ITS, mitos,
+            consentimiento y prevención.
+        </p>
+
+        <button class="start-button" onclick="startQuiz()">
+            COMENZAR QUIZ
+        </button>
+
+    </div>
+
+
+    <!-- QUIZ -->
+
+    <div class="quiz-screen" id="quizScreen">
+
+        <div class="top-info">
+
+            <span id="questionNumber">
+                Pregunta 1 de 20
+            </span>
+
+            <span id="scoreText">
+                Puntos: 0
+            </span>
+
+        </div>
+
+        <div class="progress-container">
+
+            <div class="progress-bar" id="progressBar"></div>
+
+        </div>
+
+        <div class="category" id="category">
+            Anatomía
+        </div>
+
+        <h2 class="question" id="question">
+        </h2>
+
+        <div class="answers" id="answers">
+        </div>
+
+        <div class="feedback" id="feedback">
+        </div>
+
+        <div class="next-container" id="nextContainer">
+
+            <button class="next-button" onclick="nextQuestion()">
+                CONTINUAR →
+            </button>
+
+        </div>
+
+    </div>
+
+
+    <!-- RESULTADO -->
+
+    <div class="result-screen" id="resultScreen">
+
+        <div class="result-icon" id="resultIcon">
+            🏆
+        </div>
+
+        <h1 id="resultTitle">
+            ¡Quiz terminado!
+        </h1>
+
+        <div class="score" id="finalScore">
+            0/20
+        </div>
+
+        <p class="result-message" id="resultMessage">
+        </p>
+
+        <button class="restart-button" onclick="restartQuiz()">
+            VOLVER A INTENTAR
+        </button>
+
+    </div>
+
+</div>
+
+</div>
+
+
+<script>
+
+const questions = [
+
+{
+category: "Anatomía y cambios del cuerpo",
+question: "¿Cuál es una función principal de los ovarios?",
+answers: [
+"Producir espermatozoides",
+"Producir óvulos y hormonas sexuales",
+"Almacenar la orina",
+"Producir sangre"
+],
+correct: 1,
+explanation: "Los ovarios producen óvulos y hormonas sexuales como estrógeno y progesterona."
+},
+
+{
+category: "Anatomía y cambios del cuerpo",
+question: "¿Cuál es una función principal de los testículos?",
+answers: [
+"Producir óvulos",
+"Producir espermatozoides y testosterona",
+"Producir leche materna",
+"Almacenar la orina"
+],
+correct: 1,
+explanation: "Los testículos producen espermatozoides y la hormona sexual testosterona."
+},
+
+{
+category: "Anatomía y cambios del cuerpo",
+question: "¿Cuál de estos puede ser un cambio normal durante la pubertad?",
+answers: [
+"Crecimiento de vello corporal",
+"Pérdida permanente de la memoria",
+"Dejar de crecer inmediatamente",
+"No experimentar ningún cambio"
+],
+correct: 0,
+explanation: "Durante la pubertad pueden aparecer cambios como crecimiento de vello, cambios en la voz y desarrollo corporal."
+},
+
+{
+category: "Anatomía y cambios del cuerpo",
+question: "¿Qué es la menstruación?",
+answers: [
+"Una enfermedad",
+"La eliminación de tejido y sangre del útero cuando no ocurre un embarazo",
+"Una infección",
+"Un método anticonceptivo"
+],
+correct: 1,
+explanation: "La menstruación ocurre cuando el revestimiento del útero se desprende al no producirse un embarazo."
+},
+
+{
+category: "Anatomía y cambios del cuerpo",
+question: "¿Dónde se desarrolla normalmente un embarazo?",
+answers: [
+"En los ovarios",
+"En el útero",
+"En la vagina",
+"En los riñones"
+],
+correct: 1,
+explanation: "Normalmente, el embarazo se desarrolla en el útero."
+},
+
+{
+category: "Métodos anticonceptivos",
+question: "¿Para qué sirven principalmente los métodos anticonceptivos?",
+answers: [
+"Para prevenir o reducir la posibilidad de un embarazo",
+"Para eliminar todas las ITS",
+"Para detener la pubertad",
+"Para aumentar la fertilidad"
+],
+correct: 0,
+explanation: "Los métodos anticonceptivos ayudan principalmente a prevenir o reducir la posibilidad de un embarazo."
+},
+
+{
+category: "Métodos anticonceptivos",
+question: "¿Cuál de estos métodos también ayuda a reducir el riesgo de ITS?",
+answers: [
+"Condón",
+"Pastilla anticonceptiva",
+"DIU hormonal",
+"Implante"
+],
+correct: 0,
+explanation: "El uso correcto del condón puede reducir el riesgo de varias infecciones de transmisión sexual."
+},
+
+{
+category: "Métodos anticonceptivos",
+question: "¿Cuál de estos es un método anticonceptivo hormonal?",
+answers: [
+"Condón",
+"Implante anticonceptivo",
+"Espermicida natural",
+"Calendario escolar"
+],
+correct: 1,
+explanation: "El implante anticonceptivo libera hormonas que ayudan a prevenir el embarazo."
+},
+
+{
+category: "Métodos anticonceptivos",
+question: "¿Cuál es una característica importante del condón?",
+answers: [
+"Puede reutilizarse varias veces",
+"Debe utilizarse uno nuevo en cada relación sexual",
+"Solo sirve para prevenir el embarazo",
+"No necesita colocarse antes del contacto sexual"
+],
+correct: 1,
+explanation: "Debe utilizarse un condón nuevo en cada relación sexual y colocarse antes del contacto genital."
+},
+
+{
+category: "Métodos anticonceptivos",
+question: "¿Qué se debe hacer si un condón se rompe durante una relación sexual?",
+answers: [
+"Ignorar la situación",
+"Buscar orientación sobre anticoncepción de emergencia y considerar pruebas de ITS según el caso",
+"Lavar únicamente el condón",
+"Utilizar nuevamente el mismo condón"
+],
+correct: 1,
+explanation: "Ante una rotura, es recomendable buscar orientación sobre anticoncepción de emergencia y valorar el riesgo de ITS."
+},
+
+{
+category: "Mitos y realidades",
+question: "¿Es cierto que la primera vez no puede ocurrir un embarazo?",
+answers: [
+"Sí, nunca ocurre",
+"No, puede ocurrir un embarazo",
+"Solo ocurre después de los 18 años",
+"Solo ocurre durante la menstruación"
+],
+correct: 1,
+explanation: "El embarazo puede ocurrir desde la primera relación sexual si existe una situación en la que pueda producirse fecundación."
+},
+
+{
+category: "Mitos y realidades",
+question: "¿Bañarse después de una relación sexual evita un embarazo?",
+answers: [
+"Sí",
+"No",
+"Solo con agua fría",
+"Solo con jabón"
+],
+correct: 1,
+explanation: "Bañarse después de una relación sexual no evita un embarazo."
+},
+
+{
+category: "Mitos y realidades",
+question: "¿El condón reduce el riesgo de algunas infecciones de transmisión sexual?",
+answers: [
+"Sí, cuando se utiliza correctamente",
+"No, nunca",
+"Solo durante la primera relación",
+"Únicamente si se utiliza después de la relación"
+],
+correct: 0,
+explanation: "El uso correcto y constante del condón puede reducir el riesgo de varias ITS."
+},
+
+{
+category: "Mitos y realidades",
+question: "¿Todas las personas experimentan la pubertad exactamente de la misma manera?",
+answers: [
+"Sí",
+"No, cada persona puede experimentar cambios a diferentes edades y ritmos",
+"Solo los hombres",
+"Solo las mujeres"
+],
+correct: 1,
+explanation: "La pubertad es un proceso individual. Los cambios pueden aparecer en diferentes momentos y con distintos ritmos."
+},
+
+{
+category: "Mitos y realidades",
+question: "¿Hablar sobre educación sexual significa incentivar a los jóvenes a tener relaciones sexuales?",
+answers: [
+"Sí",
+"No, proporciona información para tomar decisiones responsables y cuidar la salud",
+"Solo depende de la edad",
+"Siempre ocurre lo mismo"
+],
+correct: 1,
+explanation: "La educación sexual proporciona información y herramientas para tomar decisiones responsables y cuidar la salud."
+},
+
+{
+category: "Salud, prevención y consentimiento",
+question: "¿Qué significa consentimiento?",
+answers: [
+"Aceptar algo libremente, sin presión ni amenazas",
+"No decir nada",
+"Hacer algo porque otra persona insiste",
+"Aceptar automáticamente por estar en una relación"
+],
+correct: 0,
+explanation: "El consentimiento debe ser libre, informado y sin presión. Estar en una relación no significa aceptar todo automáticamente."
+},
+
+{
+category: "Salud, prevención y consentimiento",
+question: "¿Qué son las ITS?",
+answers: [
+"Infecciones que pueden transmitirse principalmente mediante contacto sexual",
+"Enfermedades que solo afectan a adultos",
+"Cambios normales de la pubertad",
+"Un tipo de método anticonceptivo"
+],
+correct: 0,
+explanation: "Las ITS son infecciones que pueden transmitirse principalmente mediante contacto sexual, aunque algunas también tienen otras vías de transmisión."
+},
+
+{
+category: "Salud, prevención y consentimiento",
+question: "¿Cuál es una buena fuente de información sobre salud sexual?",
+answers: [
+"Cadenas de redes sociales sin verificar",
+"Información de profesionales y fuentes de salud confiables",
+"Rumores entre amigos",
+"Cualquier publicación de internet"
+],
+correct: 1,
+explanation: "Es mejor consultar profesionales de salud y fuentes confiables para obtener información sobre salud sexual."
+},
+
+{
+category: "Salud, prevención y consentimiento",
+question: "Si un joven tiene una duda sobre su salud sexual, ¿qué debería hacer?",
+answers: [
+"Ignorarla",
+"Buscar orientación de un profesional de salud o adulto de confianza",
+"Seguir cualquier consejo de internet",
+"Automedicarse"
+],
+correct: 1,
+explanation: "Buscar orientación de profesionales de salud o adultos de confianza puede ayudar a obtener información segura y adecuada."
+},
+
+{
+category: "Salud, prevención y consentimiento",
+question: "¿Por qué es importante respetar los límites de otras personas?",
+answers: [
+"Porque todas las personas tienen derecho a decidir sobre su cuerpo y sus relaciones",
+"Porque evita todas las enfermedades",
+"Porque es obligatorio estar de acuerdo con todo",
+"Porque permite convencer a la otra persona"
+],
+correct: 0,
+explanation: "Respetar los límites reconoce que cada persona tiene derecho a decidir sobre su cuerpo y sus relaciones."
+}
+
+];
+
+
+let currentQuestion = 0;
+let score = 0;
+let answered = false;
+
+
+function startQuiz() {
+
+    currentQuestion = 0;
+    score = 0;
+
+    document.getElementById("startScreen").style.display = "none";
+    document.getElementById("quizScreen").style.display = "block";
+    document.getElementById("resultScreen").style.display = "none";
+
+    showQuestion();
+}
+
+
+function showQuestion() {
+
+    answered = false;
+
+    const q = questions[currentQuestion];
+
+    document.getElementById("questionNumber").textContent =
+        `Pregunta ${currentQuestion + 1} de ${questions.length}`;
+
+    document.getElementById("scoreText").textContent =
+        `Puntos: ${score}`;
+
+    document.getElementById("category").textContent =
+        q.category;
+
+    document.getElementById("question").textContent =
+        q.question;
+
+    const progress =
+        ((currentQuestion) / questions.length) * 100;
+
+    document.getElementById("progressBar").style.width =
+        progress + "%";
+
+
+    const answersContainer =
+        document.getElementById("answers");
+
+    answersContainer.innerHTML = "";
+
+
+    q.answers.forEach((answer, index) => {
+
+        const button = document.createElement("button");
+
+        button.className = "answer";
+
+        button.innerHTML =
+            `<strong>${String.fromCharCode(65 + index)}.</strong> ${answer}`;
+
+        button.onclick = () =>
+            selectAnswer(index, button);
+
+        answersContainer.appendChild(button);
+
+    });
+
+
+    document.getElementById("feedback").style.display =
+        "none";
+
+    document.getElementById("nextContainer").style.display =
+        "none";
+}
+
+
+function selectAnswer(index, selectedButton) {
+
+    if (answered) return;
+
+    answered = true;
+
+    const q = questions[currentQuestion];
+
+    const buttons =
+        document.querySelectorAll(".answer");
+
+
+    buttons.forEach(button => {
+        button.disabled = true;
+    });
+
+
+    if (index === q.correct) {
+
+        selectedButton.classList.add("correct");
+
+        score++;
+
+        showFeedback(
+            true,
+            "¡Correcto! 🎉",
+            q.explanation
+        );
+
+    } else {
+
+        selectedButton.classList.add("incorrect");
+
+        buttons[q.correct].classList.add("correct");
+
+        showFeedback(
+            false,
+            "❌ Incorrecto",
+            `La respuesta correcta es: ${q.answers[q.correct]}. ${q.explanation}`
+        );
+
+    }
+
+
+    document.getElementById("scoreText").textContent =
+        `Puntos: ${score}`;
+
+    document.getElementById("nextContainer").style.display =
+        "block";
+}
+
+
+function showFeedback(correct, title, text) {
+
+    const feedback =
+        document.getElementById("feedback");
+
+    feedback.innerHTML =
+        `<strong>${title}</strong><br>${text}`;
+
+    feedback.style.display = "block";
+
+    if (correct) {
+
+        feedback.className =
+            "feedback correct-feedback";
+
+    } else {
+
+        feedback.className =
+            "feedback incorrect-feedback";
+
+    }
+}
+
+
+function nextQuestion() {
+
+    currentQuestion++;
+
+    if (currentQuestion < questions.length) {
+
+        showQuestion();
+
+    } else {
+
+        showResult();
+
+    }
+}
+
+
+function showResult() {
+
+    document.getElementById("quizScreen").style.display =
+        "none";
+
+    document.getElementById("resultScreen").style.display =
+        "block";
+
+
+    document.getElementById("finalScore").textContent =
+        `${score}/${questions.length}`;
+
+
+    let title;
+    let message;
+    let icon;
+
+
+    if (score >= 17) {
+
+        icon = "🌟";
+        title = "¡Excelente!";
+
+        message =
+            "Tienes muy buenos conocimientos sobre salud sexual. Sigue aprendiendo y compartiendo información confiable.";
+
+    }
+
+    else if (score >= 13) {
+
+        icon = "👏";
+        title = "¡Muy bien!";
+
+        message =
+            "Tienes una buena base de conocimientos. Revisa las preguntas que fallaste para seguir aprendiendo.";
+
+    }
+
+    else if (score >= 9) {
+
+        icon = "📚";
+        title = "¡Buen comienzo!";
+
+        message =
+            "Ya tienes algunos conocimientos importantes. Explora las secciones de AURA para aprender más.";
+
+    }
+
+    else {
+
+        icon = "💡";
+        title = "¡Sigamos aprendiendo!";
+
+        message =
+            "No te preocupes por el resultado. El objetivo de AURA es ayudarte a conocer mejor tu cuerpo, tu salud y tus derechos.";
+
+    }
+
+
+    document.getElementById("resultIcon").textContent =
+        icon;
+
+    document.getElementById("resultTitle").textContent =
+        title;
+
+    document.getElementById("resultMessage").textContent =
+        message;
+
+
+    document.getElementById("progressBar").style.width =
+        "100%";
+}
+
+
+function restartQuiz() {
+
+    startQuiz();
+
+}
+
+</script>
+
+</body>
+</html>
